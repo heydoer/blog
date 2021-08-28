@@ -1,0 +1,14 @@
+{
+  "name": "Blog",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "liguoxian <ideafrom@163.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "vuepress": "^2.0.0-beta.24"
+  },
+  "scripts": {
+    "dou:dev": "vuepress dev liguoxian.cc",
+    "dou:build": "vuepress build liguoxian.cc"
+  }
+}
