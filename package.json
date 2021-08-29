@@ -5,10 +5,11 @@
   "author": "liguoxian <ideafrom@163.com>",
   "license": "MIT",
   "devDependencies": {
+    "@vuepress/plugin-search": "^2.0.0-beta.24",
     "vuepress": "^2.0.0-beta.24"
   },
   "scripts": {
-    "dou:dev": "vuepress dev liguoxian.cc",
-    "dou:build": "vuepress build liguoxian.cc"
+    "dev": "vuepress dev liguoxian.cc",
+    "build": "vuepress build liguoxian.cc"
   }
 }
