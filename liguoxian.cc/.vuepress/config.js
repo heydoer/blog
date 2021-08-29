@@ -1,18 +1,24 @@
 module.exports = {
   themeConfig: {
     navbar: [
-      // NavbarItem
       {
-        text: 'Foo',
-        link: '/foo/',
+        text: 'LDD',
+        children: [
+          {text: 'Hello World', link: '/ldd/01-HelloWorld.md'}, 
+          {text: '字符设备驱动', link: '/ldd/02-字符设备驱动.md'}, 
+          {text: '调试技术', link: '/ldd/03-调试技术.md'},
+        ],
       },
-      // NavbarGroup
       {
-        text: 'Group',
-        children: ['/group/foo.md', '/group/bar.md'],
+        text: 'Network',
+        children: [],
       },
-      // 字符串 - 页面文件路径
-      '/bar/README.md',
+      {
+        text: 'Misc',
+        children: [
+          {text: '10分钟搭建个人博客', link: '/misc/十分钟搭建个人博客.md'}, 
+        ],
+      },
     ],
   },
   plugins: [
