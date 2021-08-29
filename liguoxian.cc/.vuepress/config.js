@@ -16,7 +16,7 @@ module.exports = {
       {
         text: 'Misc',
         children: [
-          {text: '10分钟搭建个人博客', link: '/misc/十分钟搭建个人博客.md'}, 
+          {text: '15分钟搭建个人博客', link: '/misc/15分钟搭建个人博客.md'}, 
         ],
       },
     ],
