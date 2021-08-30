@@ -1,8 +1,8 @@
 Arguments: 
-  /usr/local/bin/node /usr/local/bin/yarn publish:dev
+  /usr/local/Cellar/node@14/14.17.5/bin/node /usr/local/Cellar/yarn/1.22.11/libexec/bin/yarn.js publish
 
 PATH: 
-  /usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/go/bin:/Users/dou/go/bin:/Users/dou/go/bin
+  /usr/local/opt/node@14/bin:/Users/bytedance/go/bin:/usr/local/opt/bison/bin:/usr/local/opt/mysql@5.7/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/go/bin:/opt/puppetlabs/bin:/usr/local/munki:/usr/local/Cellar/node@14/14.16.1/bin
 
 Yarn version: 
   1.22.11
@@ -14,12 +14,17 @@ Platform:
   darwin x64
 
 Trace: 
-  SyntaxError: /Users/dou/Blog/package.json: Unexpected string in JSON at position 355
-      at JSON.parse (<anonymous>)
-      at /usr/local/lib/node_modules/yarn/lib/cli.js:1625:59
-      at Generator.next (<anonymous>)
-      at step (/usr/local/lib/node_modules/yarn/lib/cli.js:310:30)
-      at /usr/local/lib/node_modules/yarn/lib/cli.js:321:13
+  Error: canceled
+      at Interface.<anonymous> (/usr/local/Cellar/yarn/1.22.11/libexec/lib/cli.js:137023:13)
+      at Interface.emit (events.js:400:28)
+      at Interface._ttyWrite (readline.js:910:16)
+      at ReadStream.onkeypress (readline.js:235:10)
+      at ReadStream.emit (events.js:400:28)
+      at emitKeys (internal/readline/utils.js:358:14)
+      at emitKeys.next (<anonymous>)
+      at ReadStream.onData (readline.js:1179:36)
+      at ReadStream.emit (events.js:400:28)
+      at addChunk (internal/streams/readable.js:290:12)
 
 npm manifest: 
   {
@@ -35,8 +40,9 @@ npm manifest:
     "scripts": {
       "dev": "vuepress dev liguoxian.cc",
       "build": "vuepress build liguoxian.cc",
-      "publish:dev" "git add . && git commit -m \"publish\" && git push -f dev",
-      "publish:prod" "git add . && git commit -m \"publish\" && git push -f prod"
+      "publish:dev": "git add . && git commit -m \"publish\" --allow-empty && git push -f dev",
+      "publish:prod": "git add . && git commit -m \"publish\" --allow-empty && git push -f prod",
+      "push": "git add . && git commit -m \"publish\" --allow-empty && git push -f origin"
     }
   }
 
