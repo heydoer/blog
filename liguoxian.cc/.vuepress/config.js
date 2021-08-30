@@ -2,6 +2,10 @@ module.exports = {
   themeConfig: {
     navbar: [
       {
+        text: "Home",
+        link: "/"
+      },
+      {
         text: 'LDD',
         children: [
           {text: 'Hello World', link: '/ldd/01-HelloWorld.md'}, 
