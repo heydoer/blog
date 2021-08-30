@@ -1,5 +1,7 @@
 module.exports = {
   themeConfig: {
+    lastUpdatedText: '更新于',
+    contributorsText: '作者',
     navbar: [
       {
         text: "Home",
