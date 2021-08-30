@@ -5,5 +5,5 @@ tagline:
 footerHtml: true
 footer: <a href="https://beian.miit.gov.cn/" target="_blank">粤ICP备19020295号</a>
 ---
-# 关于我
-hi，我是黎国贤
+# About me
+我叫阿贤，一个平庸的码农，这是我的博客
