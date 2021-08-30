@@ -9,8 +9,6 @@ module.exports = {
         text: 'LDD',
         children: [
           {text: 'Hello World', link: '/ldd/01-HelloWorld.md'}, 
-          {text: '字符设备驱动', link: '/ldd/02-字符设备驱动.md'}, 
-          {text: '调试技术', link: '/ldd/03-调试技术.md'},
         ],
       },
       {
@@ -20,7 +18,7 @@ module.exports = {
       {
         text: 'Misc',
         children: [
-          {text: '30分钟搭建个人博客', link: '/misc/30分钟搭建个人博客.md'},
+          {text: '30分钟搭建个人博客', link: '/misc/how_to_build_a_blog.md'},
         ],
       },
     ],
