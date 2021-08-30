@@ -12,6 +12,7 @@
     "dev": "vuepress dev liguoxian.cc",
     "build": "vuepress build liguoxian.cc",
     "publish:dev": "git add . && git commit -m \"publish\" --allow-empty && git push -f dev",
-    "publish:prod": "git add . && git commit -m \"publish\" --allow-empty && git push -f prod"
+    "publish:prod": "git add . && git commit -m \"publish\" --allow-empty && git push -f prod",
+    "publish": "git add . && git commit -m \"publish\" --allow-empty && git push -f origin"
   }
 }
