@@ -8,24 +8,18 @@ module.exports = {
         link: "/"
       },
       {
-        text: 'LDD',
-        children: [
-          {text: 'Hello World', link: '/ldd/01-HelloWorld.md'}, 
-        ],
-      },
-      {
         text: 'Golang',
         children: [
           {
             text: '深入学习',
             children: [
               {
-                text: '语言实现',
-                link: '/golang/golang-source-code-introduction.md',
+                text: '通道',
+                link: '/golang/chan.md',
               },
               {
-                text: '通道 chan',
-                link: '/golang/golang-source-code-introduction.md',
+                text: '协程',
+                link: '/golang/goroutine.md',
               },
             ],
           }, 
