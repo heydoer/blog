@@ -14,8 +14,35 @@ module.exports = {
         ],
       },
       {
-        text: 'Network',
-        children: [],
+        text: 'Golang',
+        children: [
+          {
+            text: '深入学习',
+            children: [
+              {
+                text: '语言实现',
+                link: '/golang/golang-source-code-introduction.md',
+              },
+              {
+                text: '通道 chan',
+                link: '/golang/golang-source-code-introduction.md',
+              },
+            ],
+          }, 
+          {
+            text: '个人项目',
+            children: [
+              {
+                text: '协程池 gopool',
+                link: '/golang/golang-source-code-introduction.md',
+              },
+              {
+                text: '延时任务 delay',
+                link: '/golang/golang-source-code-introduction.md',
+              },
+            ],
+          }, 
+        ],
       },
       {
         text: 'Misc',
