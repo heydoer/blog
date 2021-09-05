@@ -28,11 +28,11 @@ module.exports = {
             children: [
               {
                 text: '协程池 gopool',
-                link: '/golang/golang-source-code-introduction.md',
+                link: '/golang/gopool.md',
               },
               {
                 text: '延时任务 delay',
-                link: '/golang/golang-source-code-introduction.md',
+                link: '/golang/delay_job.md',
               },
             ],
           }, 
