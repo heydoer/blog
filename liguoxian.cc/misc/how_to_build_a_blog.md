@@ -97,6 +97,10 @@ CODE_DIR="/home/git/repos/$REPOS_NAME"
 REPOS_DIR="/home/git/$REPOS_NAME.git"
 DIST_DIR="/home/www/$SITE"
 
+# 设置仓库工作路径，否则vuepress将不能正确获取作者、修改时间等提交信息
+export GIT_DIR="$CODE_DIR/.git"
+export GIT_WORK_TREE="$CODE_DIR"
+
 # 同步仓库内容
 if [ ! -d $CODE_DIR ]
 then
