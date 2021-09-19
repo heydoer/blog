@@ -41,7 +41,7 @@ module.exports = {
       {
         text: 'Website',
         children: [
-          {text: '30分钟搭建个人博客', link: '/misc/how_to_build_a_blog.md'},
+          {text: '30分钟搭建个人博客', link: '/Website/how_to_build_a_blog.md'},
         ],
       },
     ],
