@@ -55,21 +55,10 @@ export FLASK_APP=main.py
 # * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
 ```
 
-## 设计
 
-以下给出基础的手机验证码登陆设计，一个基础的手机短信登陆设计主要分为三个模块，分别是：
+## 设计&实现
 
-- 功能设计（如何推送&校验短信）
-- 鉴权设计（token如何设计）
-- 风控设计（如何防刷）
-
-本文设计的登陆模块完整流程如下：
-
-![注册&登陆流程](/images/phone_auth_1.jpeg)
-
-## 编码实现
-
-TODO @liguoxian
+### 模块划分
 
 ## 总结
 备注：本文档相关代码可以从 [github/heydoer](https://github.com/heydoer/flask_auth_demo) 获取。
