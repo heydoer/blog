@@ -72,7 +72,7 @@ export FLASK_APP=main.py
 TODO @liguoxian
 
 ## 总结
-备注：本文档相关代码可以从 https://github.com/heydoer/flask_auth_demo 获取。
+备注：本文档相关代码可以从 [github/heydoer](https://github.com/heydoer/flask_auth_demo) 获取。
 
 
 
