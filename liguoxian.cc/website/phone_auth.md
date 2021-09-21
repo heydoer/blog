@@ -59,6 +59,11 @@ export FLASK_APP=main.py
 ## 设计&实现
 
 ### 模块划分
+可以将注册登陆流程简单划分为验证码验证与用户会话两个模块，如下：
+
+### 目录结构
+
+### 编码
 
 ## 总结
 备注：本文档相关代码可以从 [github/heydoer](https://github.com/heydoer/flask_auth_demo) 获取。

@@ -3,7 +3,7 @@ home: true
 heroText: 
 tagline: 
 footerHtml: true
-_footer: <a href="https://beian.miit.gov.cn/" target="_blank">粤ICP备19020295号</a>
+footer: <a href="https://beian.miit.gov.cn/" target="_blank">粤ICP备19020295号</a>
 ---
 
 # About me
@@ -24,3 +24,4 @@ _footer: <a href="https://beian.miit.gov.cn/" target="_blank">粤ICP备19020295�
 如果你想与我交流，我的邮箱是 ideafrom@163.com 。
 
 最后，谢谢大家来看我博客 - -// 。
+
