@@ -69,17 +69,10 @@ export FLASK_APP=main.py
 
 ## 编码实现
 
-### 功能
+TODO @liguoxian
 
-本小节将实现手机短信推送&校验的功能。
-
-### 鉴权
-
-本小节实现jwt鉴权流程。
-
-### 风控
-
-本小节实现一些风控防刷机制。
+## 总结
+备注：本文档相关代码可以从 https://github.com/heydoer/flask_auth_demo 获取。
 
 
 
