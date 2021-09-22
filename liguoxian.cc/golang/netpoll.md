@@ -17,8 +17,8 @@ netpoll 的源码实现大致可以划分为4个模块（不包括facade），�
 | module | desc |
 | ------ | ---- |
 | syscall | 系统调用相关 |
-| poll& | 连接管理低级API |
 | linkbuffer | 缓冲区管理相关 |
+| poll&netFD | 连接管理低级API |
 | connection | 连接管理高级API |
 
 模块间大致的依赖关系如下:
