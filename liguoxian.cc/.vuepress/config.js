@@ -1,4 +1,9 @@
 module.exports = {
+  markdown: {
+    extractHeaders: {
+      level: [2, 3, 4]
+    }
+  },
   themeConfig: {
     lastUpdatedText: '更新于',
     contributorsText: '作者',
