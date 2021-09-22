@@ -106,22 +106,24 @@ ssize_t sendmsg(int sockfd, const struct msghdr *msg, int flags);
 
 具体实现在 *sys_exec.go* 与 *sys_send_msg_linux.go*:
 ```go
-// sys_exec.go
+// netpoll/sys_exec.go
 func readv(fd int, bs [][]byte, ivs []syscall.Iovec) (n int, err error)
 
-// sys_send_msg_linux
+// netpoll/sys_send_msg_linux.go
 func sendmsg(fd int, bs [][]byte, ivs []syscall.Iovec, zerocopy bool) (n int, err error)
 ```
 
 这两个调用虽然很简单，但这是netpoll最核心的两个系统调用，在cs完成连接建立后，netpoll的所有网络事件，都将由这两个调用驱动，形成一个IO闭环。
 
-这个闭环我们可以在*poll_default_linux.go*里看到:
+这个闭环我们可以在*netpoll/poll_default_linux.go*里看到:
 
 ```go
+// netpoll/poll_default_linux.go
+
 // ...
 
 func (p *defaultPoll) handler(events []epollevent) (closed bool) {
-	for i := range events {
+	for i := range events { // 遍历epoll网络事件
 		var operator = *(**FDOperator)(unsafe.Pointer(&events[i].data))
 		evt := events[i].events				
 		switch {
@@ -159,7 +161,9 @@ func (p *defaultPoll) handler(events []epollevent) (closed bool) {
 
 关于syscall的内容，源码还有很多细节可以深入挖掘，但作为一个宏观上的学习笔记，讲到这里就差不多了，下面我们学习另一个底层基础：缓冲管理。
 
-### 缓存管理
+### 缓冲区管理
+
+缓冲区是网络IO中，对于性能影响最大的模块之一，netpoll采用了*link_buffer*模型，依托golang的slice底层实现原理，实现了一个用户层的 *"zero copy"* 的缓冲（注意，这里的zero copy带双引号，作用域仅局限于用户层，与系统调用的zero copy概念没有关系）。
 
 ### 低级连接管理
 
