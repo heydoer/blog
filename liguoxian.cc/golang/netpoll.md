@@ -163,7 +163,15 @@ func (p *defaultPoll) handler(events []epollevent) (closed bool) {
 
 ### 缓冲区管理
 
-缓冲区是网络IO中，对于性能影响最大的模块之一，netpoll采用了*link_buffer*模型，依托golang的slice底层实现原理，实现了一个用户层的 *"zero copy"* 的缓冲（注意，这里的zero copy带双引号，作用域仅局限于用户层，与系统调用的zero copy概念没有关系）。
+缓冲区是网络IO中，对于性能影响最大的模块之一，netpoll采用了*link_buffer*模型，依托golang的slice底层实现原理，实现了一个用户层的 *"zero copy"* 的缓冲（注意，这里的zero copy带双引号，作用域仅局限于用户层，与系统调用的zero copy概念没有关系，且，也并非所有用户态场景都实现了零拷贝）。
+
+大多数link buffer的实现思路都是以链表形式管理多个小缓存，从而实现时间与空间能效的平衡，netpoll/link_buffer 基本设计思想也是一样的。
+
+备注：无特殊说明，下文出现的 *link buffer* 指的是 *netpoll/link_buffer*。
+
+首先给出*link_buffer*的结构图例：
+
+TODO @liguoxian
 
 ### 低级连接管理
 
