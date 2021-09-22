@@ -26,6 +26,12 @@ module.exports = {
               {text: '延时任务 delay', link: '/golang/delay_job.md'},
             ],
           }, 
+          {
+            text: '开源项目',
+            children: [
+              {text: 'netpoll', link: '/golang/netpoll.md'},
+            ],
+          }, 
         ],
       },
       {
