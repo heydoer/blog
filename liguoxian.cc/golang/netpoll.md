@@ -105,7 +105,7 @@ ssize_t sendmsg(int sockfd, const struct msghdr *msg, int flags);
 
 
 具体实现在 *sys_exec.go* 与 *sys_send_msg_linux.go*:
-```golang
+```go
 // sys_exec.go
 func readv(fd int, bs [][]byte, ivs []syscall.Iovec) (n int, err error)
 
@@ -117,7 +117,7 @@ func sendmsg(fd int, bs [][]byte, ivs []syscall.Iovec, zerocopy bool) (n int, er
 
 这个闭环我们可以在*poll_default_linux.go*里看到:
 
-```golang
+```go
 // ...
 
 func (p *defaultPoll) handler(events []epollevent) (closed bool) {
@@ -155,10 +155,13 @@ func (p *defaultPoll) handler(events []epollevent) (closed bool) {
 // ...
 ```
 
+在*handler*方法里，其实已经告诉我们netpoll运作的基本原理，那就是 ***网络IO+缓冲管理*** ，套路和大多数网络驱动的实现驱动都是差不多的。
 
-### 低级连接管理
+关于syscall的内容，源码还有很多细节可以深入挖掘，但作为一个宏观上的学习笔记，讲到这里就差不多了，下面我们学习另一个底层基础：缓冲管理。
 
 ### 缓存管理
+
+### 低级连接管理
 
 ### 高级连接管理
 
