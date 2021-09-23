@@ -448,6 +448,8 @@ func (c *connection) outputAck(n int) (err error) {
 }
 ```
 
+*connection*还有各种Reader/Writer API，这里就不铺开描述了，大多是基于缓冲区与FD相关的操作，有了上述基础，可以自行阅读源码。
+
 #### poll
 
 先看*poll*结构定义：
@@ -466,13 +468,18 @@ type defaultPoll struct {
 
 ```
 
+然后顺带提一下*poll_manage*，这个对象管理了很多*poll*，每当有一个*connection*被建立，就会按照一定的均衡策略分配到一个*poll*中，相关代码在*netpoll/poll_manage.go*，比较简单这里就不描述了.
+
+#### 总结
+
+结合*poll*、*connection*，这里给出一个 Server 处理事件的流程图：
+
 TODO
-
-#### read API
-
-
-#### write API
 
 ### netpoll facade API
 
+这个模块主要是对*poll*、*connection*的封装，没有太多技术含量与讲解必要，可直接阅读源码。
+
 ## 总结
+
+TODO
