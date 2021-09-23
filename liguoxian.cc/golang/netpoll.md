@@ -367,7 +367,7 @@ Inputs/InputAck、Outputs/OutputAck 实现如下，请结合 linkbuffer 理解�
 ```go
 // netpoll/connection_reactor.go
 
-// inputs FD可读，所以需要开辟write缓冲
+// inputs connection/FD可读，所以需要开辟读缓冲中的write空间
 func (c *connection) inputs(vs [][]byte) (rs [][]byte) {
 	// 当前需要读入的字节数
 	n := int(atomic.LoadInt32(&c.waitReadSize))
@@ -384,7 +384,7 @@ func (c *connection) inputs(vs [][]byte) (rs [][]byte) {
 	return c.inputBuffer.Book(n, vs)
 }
 
-// inputAck FD已读，write缓冲区写入完毕，确认写入数据（让该缓冲数据可读）
+// inputAck connection/FD已读，读缓冲区写入完毕，确认写入数据（让该缓冲数据可读）
 func (c *connection) inputAck(n int) (err error) {
 	if n < 0 {
 		n = 0
@@ -395,36 +395,46 @@ func (c *connection) inputAck(n int) (err error) {
 	// 类似 linkBuffer.flush(n)
 	err = c.inputBuffer.BookAck(n, leftover <= 0)
 
-	// 触发读事件，如果有上层接口调用了 connection.Read(n), 则阻塞将被返回，以便重新校验是否可读出
+	// 触发读事件，如果有上层接口调用了 connection.Read(n), 则阻塞将被返回，以便重新校验是否可读出需要大小的数据
 	c.triggerRead()
 
+	// Server端注册的回调函数
 	c.onRequest()
+
 	return err
 }
 
-// outputs implements FDOperator.
+// outputs connection/FD可写的时候，需要将写缓冲中未读内容返回
 func (c *connection) outputs(vs [][]byte) (rs [][]byte, supportZeroCopy bool) {
 	if !c.lock(writing) {
 		return rs, c.supportZeroCopy
 	}
-	if c.outputBuffer.IsEmpty() {
+	if c.outputBuffer.IsEmpty() { 
+		// 没有数据可写到fd，返回，先等待写缓冲中有数据可读
 		c.unlock(writing)
+		// 将poll中的事件监听由读写转换成读，因为暂时没有内容可写
 		c.rw2r()
 		return rs, c.supportZeroCopy
 	}
+
+	// 将写缓冲区中所有未读数据返回
 	rs = c.outputBuffer.GetBytes(vs)
 	return rs, c.supportZeroCopy
 }
 
-// outputAck implements FDOperator.
+// outputAck 在output返回可写的数据，并成功sendmsg后，需要确认写缓冲中的数据为已读，避免重复读
 func (c *connection) outputAck(n int) (err error) {
 	if n > 0 {
+		// 设置n字节的数据为已读，并且释放掉已读数据空间
 		c.outputBuffer.Skip(n)
 		c.outputBuffer.Release()
 	}
+
 	// must unlock before check empty
 	c.unlock(writing)
+	
 	if c.outputBuffer.IsEmpty() {
+		// 将poll中的事件监听由读写转换成读，因为暂时没有内容可写
 		c.rw2r()
 	}
 	return nil
