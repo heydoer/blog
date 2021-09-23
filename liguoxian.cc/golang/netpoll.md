@@ -476,9 +476,6 @@ type defaultPoll struct {
 
 TODO
 
-### netpoll facade API
-
-这个模块主要是对*poll*、*connection*的封装，没有太多技术含量与讲解必要，可直接阅读源码。
 
 ## 总结
 
