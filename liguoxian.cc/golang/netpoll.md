@@ -336,36 +336,89 @@ type connection struct {
 ```go
 // netpoll/fd_operator.go
 
-// FDOperator is a collection of operations on file descriptors.
+// FDOperator 集合了对FD的操作.
 type FDOperator struct {
-	// FD is file descriptor, poll will bind when register.
+	// 和 connection.fd 是同一个，
+	// 通常在初始化一个connection之后，就会将这个fd注册到poll上面监听
 	FD int
 
-	// The FDOperator provides three operations of reading, writing, and hanging.
-	// The poll actively fire the FDOperator when fd changes, no check the return value of FDOperator.
-	OnRead  func(p Poll) error
-	OnWrite func(p Poll) error
-	OnHup   func(p Poll) error
-
-	// The following is the required fn, which must exist when used, or directly panic.
-	// Fns are only called by the poll when handles connection events.
+	// 当FD可读的时候，需要依赖这个函数获取读缓冲（向inputBuffer申请开辟一个缓冲）
 	Inputs   func(vs [][]byte) (rs [][]byte)
+	// 当完成对Inputs申请的读缓冲的写入操作时，确认写入
+	// （可以理解成对linkbuffer进行一次flush(n)操作，其中n是读缓冲真实写入的字节数）
 	InputAck func(n int) (err error)
 
 	// Outputs will locked if len(rs) > 0, which need unlocked by OutputAck.
 	Outputs   func(vs [][]byte) (rs [][]byte, supportZeroCopy bool)
 	OutputAck func(n int) (err error)
 
-	// poll is the registered location of the file descriptor.
+	// 下一小节会介绍poll结构，可以抽象理解成一个epoll对象
 	poll Poll
-
-	// private, used by operatorCache
-	next  *FDOperator
-	state int32 // CAS: 0(unused) 1(inuse) 2(do-done)
 }
 
+// Control 该方法等同于 epoll_ctl
 func (op *FDOperator) Control(event PollEvent) error {
 	return op.poll.Control(op, event)
+}
+```
+
+Inputs/InputAck、Outputs/OutputAck 实现如下，请结合 linkbuffer 理解：
+
+```go
+// netpoll/connection_reactor.go
+
+// inputs implements FDOperator.
+func (c *connection) inputs(vs [][]byte) (rs [][]byte) {
+	n := int(atomic.LoadInt32(&c.waitReadSize))
+	if n <= pagesize {
+		return c.inputBuffer.Book(pagesize, vs)
+	}
+
+	n -= c.inputBuffer.Len()
+	if n < pagesize {
+		n = pagesize
+	}
+	return c.inputBuffer.Book(n, vs)
+}
+
+// inputAck implements FDOperator.
+func (c *connection) inputAck(n int) (err error) {
+	if n < 0 {
+		n = 0
+	}
+	leftover := atomic.AddInt32(&c.waitReadSize, int32(-n))
+	err = c.inputBuffer.BookAck(n, leftover <= 0)
+	c.triggerRead()
+	c.onRequest()
+	return err
+}
+
+// outputs implements FDOperator.
+func (c *connection) outputs(vs [][]byte) (rs [][]byte, supportZeroCopy bool) {
+	if !c.lock(writing) {
+		return rs, c.supportZeroCopy
+	}
+	if c.outputBuffer.IsEmpty() {
+		c.unlock(writing)
+		c.rw2r()
+		return rs, c.supportZeroCopy
+	}
+	rs = c.outputBuffer.GetBytes(vs)
+	return rs, c.supportZeroCopy
+}
+
+// outputAck implements FDOperator.
+func (c *connection) outputAck(n int) (err error) {
+	if n > 0 {
+		c.outputBuffer.Skip(n)
+		c.outputBuffer.Release()
+	}
+	// must unlock before check empty
+	c.unlock(writing)
+	if c.outputBuffer.IsEmpty() {
+		c.rw2r()
+	}
+	return nil
 }
 ```
 
