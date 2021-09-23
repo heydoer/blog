@@ -163,6 +163,7 @@ func (p *defaultPoll) handler(events []epollevent) (closed bool) {
 
 ### 缓冲区管理
 
+#### 缓冲区概述
 缓冲区是网络IO中，对于性能影响最大的模块之一，netpoll采用了*link_buffer*模型，依托golang的slice底层实现原理，实现了一个用户层的 *"zero copy"* 的缓冲（注意，这里的zero copy带双引号，作用域仅局限于用户层，与系统调用的zero copy概念没有关系，且，也并非所有用户态场景都实现了零拷贝）。
 
 大多数link buffer的实现思路都是以链表形式管理多个小缓存，从而实现时间与空间能效的平衡，netpoll/link_buffer 基本设计思想也是一样的。
@@ -171,7 +172,96 @@ func (p *defaultPoll) handler(events []epollevent) (closed bool) {
 
 首先给出*link_buffer*的结构图例：
 
-TODO @liguoxian
+![linkbuffer结构](/images/netpoll_2.jpeg)
+
+上图给出了*linkbuffer*的核心结构，按照职责将其分为三个层次：
+
+| module | responsibility |
+| ------ | -------------- |
+| linkbuffer | facade API |
+| linkBufferNode | 管理缓冲的单元 |
+| buffer pool | 管理分配的slice |
+
+#### 核心实现
+
+带着上述理解，代码就很简单了：
+
+- ***linkbuffer***
+
+```go
+// netpoll/nocopy_linkbuffer.go
+
+// LinkBuffer 实现了各种读写API的Facede类
+type LinkBuffer struct {
+	length     int32	// 当前可读数据大小
+	mallocSize int 		// 总分配空间大小
+
+	head  *linkBufferNode // 指向头节点，释放空间时候从head释放到read
+	read  *linkBufferNode // 指向下一个待读入数据的节点（即此前的节点已经完全读取完毕）
+	flush *linkBufferNode // 指向最后一个可读数据的节点（即该该节点永远不会在read之前）
+	write *linkBufferNode // 指向下一个可写入数据的节点（flush和write之间的节点为已写入但不开放读）
+
+	// 有一些场景需要额外开辟slice用于内存拷贝，
+	// 这些新开辟的slice会暂时referred到这里，调用Realease方法时统一释放
+	// 我不太清楚这么设计的初衷，猜测是为了降低GC负荷
+	caches [][]byte 
+}
+```
+
+- ***linkbuffernode***
+```go
+// netpoll/nocopy_linkbuffer.go
+
+type linkBufferNode struct {
+	buf      []byte          // 实际存储数据的slice，当该节点refer另一个节点时候，不需要分配空间
+	off      int             // 已读offset，下一个读入数据的下标
+	malloc   int             // 已写offset，下一个写入数据的下标
+
+	// refer功能主要出现在需要“拷贝”一个node的场景
+	refer    int32           // 引用计数，只有该节点不被其他节点refer时候才能释放
+	readonly bool            // 节点是否只读，当该节点refer另一个节点时候，该值为true
+	origin   *linkBufferNode // 当该节点refer另一个节点时候，指向其引用的节点
+
+	next     *linkBufferNode // 指向下一个node节点的指针
+}
+```
+
+- ***buffer pool***
+*buffer pool* 使用的字节的开源工具包中的内存缓存 [github.com/bytedance/gopkg](https://github.com/bytedance/gopkg/tree/develop/lang/mcache)，其底层依托的是 *sync.pool*，实现很简单有兴趣可以直接去读源码。
+
+下面给出netpoll里面的使用姿势：
+```go
+// netpoll/nocopy_linkbuffer.go
+
+// mallocMax is 8MB
+const mallocMax = block8k * block1k
+
+// malloc limits the cap of the buffer from mcache.
+func malloc(size, capacity int) []byte {
+	// 大块缓存不走mcache，需要尽快归还操作系统
+	if capacity > mallocMax {
+		return make([]byte, size, capacity)
+	}
+	return mcache.Malloc(size, capacity)
+}
+
+// free limits the cap of the buffer from mcache.
+func free(buf []byte) {
+	// 大块缓存由外层代码解除引用，跟着GC返还系统
+	if cap(buf) > mallocMax {
+		return
+	}
+	mcache.Free(buf)
+}
+
+```
+
+#### 总结
+
+至此，我们应该可以很清晰脑补出*linkbuffer*读写时候底层所进行数据操作了。
+
+仍然，netpoll的 *linkbuffer* 做了许多细节调优，比如使用大量对象缓存、slice精细化管理等，正是这些细节调优，使得*linkbuffer*具备更高的性能。
+
 
 ### 低级连接管理
 
