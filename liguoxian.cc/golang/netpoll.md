@@ -270,8 +270,32 @@ netpoll对于*link_buffer*的依赖仅限于网络IO，即***系统调用***一�
 
 ### 连接管理
 
-TODO
+> 本模块仅描述 Server 端的连接管理，Dialer 端的连接管理是 Server 端子集，后文不再赘述。
 
+#### 概述
+
+连接管理是netpoll中偏上层的模块，因此，不可避免会涉及到诸多底层概念（主要是epoll、syscall、link_buffer），其中*syscall/link_buffer*在上述两个模块已经整理，请确保已掌握*epoll*相关基础。
+
+依旧先直接给出连接管理的大致结构图例（黑色表示实例、红色表示读方法调用、蓝色表示写方法调用）：
+
+![linkbuffer结构](/images/netpoll_3.jpg)
+
+原谅我拙劣的画工和表述能力，图中传递了如下几个概念，同时也是连接管理模块最核心的功能：
+
+- 每个CS连接以*connection*实例作为管理，*connection*主要维护了socketFD和读写缓冲区；
+- netpoll 维护了一个*poll pool*，池中每个*poll*都管理着多个*connection*；
+- 当 Server 需要读入数据时，需要阻塞至读缓冲存在足量数据，然后直接从缓冲区读出、无需主动调用*syscall_read*;
+- 当 Server 需要写入数据时，先尝试直接调用*syscall_sendmsg*，失败则注册epoll写事件异步发送；
+
+连接管理几乎所有的功能点，都是围绕上述几个核心概念展开，后续将展开梳理主要流程。
+
+#### connection
+
+#### poll
+
+#### read API
+
+#### write API
 
 ### netpoll facade API
 
