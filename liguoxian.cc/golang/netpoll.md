@@ -282,16 +282,68 @@ netpoll对于*link_buffer*的依赖仅限于网络IO，即***系统调用***一�
 
 原谅我拙劣的画工和表述能力，图中传递了如下几个概念，同时也是连接管理模块最核心的功能：
 
-- 每个CS连接以*connection*实例作为管理，*connection*主要维护了socketFD和读写缓冲区；
-- netpoll 维护了一个*poll pool*，池中每个*poll*都管理着多个*connection*；
+- 每个CS连接以*connection*实例作为管理，*connection*主要维护了socketFD和读写缓冲区，可以把*connection*理解成一个自带缓冲FD；
+- netpoll 维护了一个*poll pool*，池中每个*poll*都管理着多个*connection*，实际上*poll*是一个封装好的epoll对象；
 - 当 Server 需要读入数据时，需要阻塞至读缓冲存在足量数据，然后直接从缓冲区读出、无需主动调用*syscall_read*;
-- 当 Server 需要写入数据时，先尝试直接调用*syscall_sendmsg*，失败则注册epoll写事件异步发送；
+- 当 Server 需要写入数据时，先尝试直接调用*syscall_sendmsg*，失败则注册epoll写事件异步发送，但写接口会阻塞至epoll写返回；
 
-连接管理几乎所有的功能点，都是围绕上述几个核心概念展开，后续将展开梳理主要流程。
+连接管理几乎所有的功能点，都是围绕上述几个核心概念展开，后续将梳理主要流程。
+
+⚠️：后续内容实现细节较多，本文会对代码做适当删减，以方便聚焦核心功能，请参考上述4点核心功能辅助理解。
 
 #### connection
 
+```go
+// netpoll/connection_impl.go
+
+// connection 可以看作是一个自带缓冲、且内聚了对自身操作的一个FD对象
+type connection struct {
+
+	// socket FD
+	fd 			
+
+	// 关联poll，提供针对fd的操作，如 epoll_ctl 等					
+	operator        *FDOperator 	
+
+	// 当 poll 向FD读入数据时，通知上层“read(n)”接口判断接收数据长度，
+	// 如果满足要求则返回，否则继续阻塞，
+	readTrigger     chan struct{}   
+
+	// 当前连接期待读取数据长度
+	waitReadSize    int32	
+
+	// 写事件返回，参考本节概述列出的核心功能		
+	writeTrigger    chan error 	
+
+	// 读缓冲	
+	inputBuffer     *LinkBuffer 
+
+	// 写缓冲	
+	outputBuffer    *LinkBuffer 	
+
+	// 这两个结构分别对应在进行 IO 操作时候直接操作的缓冲区
+	// 实际上，这两个结构的缓冲区来自对应的 linkBuffer，复用了内存空间
+	// 将这两个结构单独抽出来，是为了解耦底层缓冲组件，方便上层操作
+	inputBarrier    *barrier 		
+	outputBarrier   *barrier
+}
+```
+
 #### poll
+
+```go
+// netpoll/poll_default_linux.go
+
+// defaultPoll 带有回调函数的epoll对象
+type defaultPoll struct {
+	// epoll fd，每个poll都可以看作是一个epoll对象，可以管理很多FD(connection)
+	fd      int         
+
+	// 事件触发时的回调方法，***系统调用*** 一章中的 syscall 调用场景，就是这个回调里的内容
+	Handler func(events []epollevent) (closed bool)
+}
+
+```
 
 #### read API
 
