@@ -209,6 +209,7 @@ type LinkBuffer struct {
 ```
 
 - ***linkbuffernode***
+
 ```go
 // netpoll/nocopy_linkbuffer.go
 
@@ -227,6 +228,7 @@ type linkBufferNode struct {
 ```
 
 - ***buffer pool***
+
 *buffer pool* 使用的字节的开源工具包中的内存缓存 [github.com/bytedance/gopkg](https://github.com/bytedance/gopkg/tree/develop/lang/mcache)，其底层依托的是 *sync.pool*，实现很简单有兴趣可以直接去读源码。
 
 下面给出netpoll里面的使用姿势：
