@@ -293,6 +293,8 @@ netpoll对于*link_buffer*的依赖仅限于网络IO，即***系统调用***一�
 
 #### connection
 
+直接看*connection*对象结构定义：
+
 ```go
 // netpoll/connection_impl.go
 
@@ -329,7 +331,47 @@ type connection struct {
 }
 ```
 
+正如上面描述所说，*connection* 内聚了缓冲管理和FD操作，缓冲管理上文我们介绍过了，而对FD的操作，实际上是在 *FDOperator* 中实现的：
+
+```go
+// netpoll/fd_operator.go
+
+// FDOperator is a collection of operations on file descriptors.
+type FDOperator struct {
+	// FD is file descriptor, poll will bind when register.
+	FD int
+
+	// The FDOperator provides three operations of reading, writing, and hanging.
+	// The poll actively fire the FDOperator when fd changes, no check the return value of FDOperator.
+	OnRead  func(p Poll) error
+	OnWrite func(p Poll) error
+	OnHup   func(p Poll) error
+
+	// The following is the required fn, which must exist when used, or directly panic.
+	// Fns are only called by the poll when handles connection events.
+	Inputs   func(vs [][]byte) (rs [][]byte)
+	InputAck func(n int) (err error)
+
+	// Outputs will locked if len(rs) > 0, which need unlocked by OutputAck.
+	Outputs   func(vs [][]byte) (rs [][]byte, supportZeroCopy bool)
+	OutputAck func(n int) (err error)
+
+	// poll is the registered location of the file descriptor.
+	poll Poll
+
+	// private, used by operatorCache
+	next  *FDOperator
+	state int32 // CAS: 0(unused) 1(inuse) 2(do-done)
+}
+
+func (op *FDOperator) Control(event PollEvent) error {
+	return op.poll.Control(op, event)
+}
+```
+
 #### poll
+
+先看*poll*结构定义：
 
 ```go
 // netpoll/poll_default_linux.go
@@ -345,7 +387,11 @@ type defaultPoll struct {
 
 ```
 
+
+
 #### read API
+
+
 
 #### write API
 
