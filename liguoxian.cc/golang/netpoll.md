@@ -1,3 +1,7 @@
+---
+sidebarDepth: 3
+---
+
 # Netpoll 实现简述
 
 ## 前言
@@ -84,6 +88,7 @@ $ tree -L 1
 
 ### 系统调用
 
+#### resdv/sendmsg
 这里指的系统调用并非宏观层面的syscall（这太多了，几乎所有go方法都依赖syscall），而是指netpoll进行网络交互的核心IO调用。
 
 netpoll依赖的核心IO系统调用只有2个，非常简单，对应的glibc函数签名为：
@@ -109,6 +114,7 @@ func sendmsg(fd int, bs [][]byte, ivs []syscall.Iovec, zerocopy bool) (n int, er
 
 这两个调用虽然很简单，但这是netpoll最核心的两个系统调用，在cs完成连接建立后，netpoll的所有网络事件，都将由这两个调用驱动，形成一个IO闭环。
 
+#### netpoll应用
 这个闭环我们可以在*netpoll/poll_default_linux.go*里看到:
 
 ```go
@@ -151,6 +157,7 @@ func (p *defaultPoll) handler(events []epollevent) (closed bool) {
 // ...
 ```
 
+#### 总结
 在*handler*方法里，其实已经告诉我们netpoll运作的基本原理，那就是 ***网络IO+缓冲管理*** ，套路和大多数网络驱动的实现驱动都是差不多的。
 
 关于syscall的内容，源码还有很多细节可以深入挖掘，但作为一个宏观上的学习笔记，讲到这里就差不多了，下面我们学习另一个底层基础：缓冲管理。
@@ -252,7 +259,7 @@ func free(buf []byte) {
 
 ```
 
-#### netpoll应用场景
+#### netpoll应用
 
 netpoll对于*link_buffer*的依赖仅限于网络IO，即***系统调用***一小节中描述的这两个IO调用，但由于上层调用比较零散，将这一块完全串联起来需要到下一个模块的讲解。
 
@@ -432,7 +439,7 @@ func (c *connection) outputAck(n int) (err error) {
 
 	// must unlock before check empty
 	c.unlock(writing)
-	
+
 	if c.outputBuffer.IsEmpty() {
 		// 将poll中的事件监听由读写转换成读，因为暂时没有内容可写
 		c.rw2r()
