@@ -348,7 +348,7 @@ type FDOperator struct {
 	// （可以理解成对linkbuffer进行一次flush(n)操作，其中n是读缓冲真实写入的字节数）
 	InputAck func(n int) (err error)
 
-	// Outputs will locked if len(rs) > 0, which need unlocked by OutputAck.
+	// 类似Inputs/InputAck，调用场景在FD可写时候。
 	Outputs   func(vs [][]byte) (rs [][]byte, supportZeroCopy bool)
 	OutputAck func(n int) (err error)
 
@@ -367,28 +367,37 @@ Inputs/InputAck、Outputs/OutputAck 实现如下，请结合 linkbuffer 理解�
 ```go
 // netpoll/connection_reactor.go
 
-// inputs implements FDOperator.
+// inputs FD可读，所以需要开辟write缓冲
 func (c *connection) inputs(vs [][]byte) (rs [][]byte) {
+	// 当前需要读入的字节数
 	n := int(atomic.LoadInt32(&c.waitReadSize))
-	if n <= pagesize {
-		return c.inputBuffer.Book(pagesize, vs)
-	}
 
+	// c.inputBuffer.Len() 返回的是inputBuffer.length，即当前可读数据大小
+	// 等待读-可读=仍需要开辟的缓冲大小
 	n -= c.inputBuffer.Len()
 	if n < pagesize {
 		n = pagesize
 	}
+
+	// 开辟write缓冲区，
+	// Book具体实现可以结合源码与本博客理解
 	return c.inputBuffer.Book(n, vs)
 }
 
-// inputAck implements FDOperator.
+// inputAck FD已读，write缓冲区写入完毕，确认写入数据（让该缓冲数据可读）
 func (c *connection) inputAck(n int) (err error) {
 	if n < 0 {
 		n = 0
 	}
+
 	leftover := atomic.AddInt32(&c.waitReadSize, int32(-n))
+
+	// 类似 linkBuffer.flush(n)
 	err = c.inputBuffer.BookAck(n, leftover <= 0)
+
+	// 触发读事件，如果有上层接口调用了 connection.Read(n), 则阻塞将被返回，以便重新校验是否可读出
 	c.triggerRead()
+
 	c.onRequest()
 	return err
 }
