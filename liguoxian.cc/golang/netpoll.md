@@ -258,6 +258,10 @@ func free(buf []byte) {
 
 ```
 
+#### netpoll应用场景
+
+TODO 这里将描述linkbuffer在netpoll中是怎么使用的。
+
 #### 总结
 
 至此，我们应该可以很清晰脑补出*linkbuffer*读写时候底层所进行数据操作了。
