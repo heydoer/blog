@@ -18,12 +18,12 @@ netpoll 的源码实现大致可以划分为4个模块（不包括facade），�
 | ------ | ---- |
 | syscall | 系统调用相关 |
 | linkbuffer | 缓冲区管理相关 |
-| poll&netFD | 连接管理低级API |
-| connection | 连接管理高级API |
+| poll&connection | 连接管理相关 |
+| netpoll | facade API |
 
 模块间大致的依赖关系如下:
 
-![模块关系](/images/netpoll_1.jpg)
+![模块关系](/images/netpoll_1.jpeg)
 
 可以看到，netpoll的实现，从宏观角度来看，还是十分简洁的。
 
@@ -36,34 +36,28 @@ netpoll 的源码实现大致可以划分为4个模块（不包括facade），�
 ```bash
 $ tree -L 1
 .
-├── # facade
+├── # facade API
 ├── netpoll.go
 ├── netpoll_options.go
 ├── netpoll_server.go
 ├── 
-├── # connection 连接管理高级API
+├── # poll/connection 连接管理API
 ├── connection.go
 ├── connection_errors.go
-├── connection_errors_test.go
 ├── connection_impl.go
 ├── connection_lock.go
 ├── connection_onevent.go
 ├── connection_reactor.go
-├── connection_test.go
-├── 
-├── # 链接管理低级API
 ├── net_dialer.go
 ├── net_listener.go
 ├── net_netfd.go
 ├── net_netfd_conn.go
 ├── net_polldesc.go
-├── net_polldesc_test.go
 ├── net_sock.go
 ├── net_tcpsock.go
 ├── net_unixsock.go
 ├── fd_operator.go
 ├── fd_operator_cache.go
-├── fd_operator_cache_test.go
 ├── poll.go
 ├── poll_default_linux.go
 ├── poll_loadbalance.go
@@ -260,7 +254,11 @@ func free(buf []byte) {
 
 #### netpoll应用场景
 
-TODO 这里将描述linkbuffer在netpoll中是怎么使用的。
+netpoll对于*link_buffer*的依赖仅限于网络IO，即***系统调用***一小节中描述的这两个IO调用，但由于上层调用比较零散，将这一块完全串联起来需要到后两个模块的讲解。
+
+仅为了宏观上有个理解，这里给个图例：
+
+
 
 #### 总结
 
