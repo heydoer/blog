@@ -74,7 +74,7 @@ $ tree -L 1
 ├── nocopy_linkbuffer.go
 ├── nocopy_readwriter.go
 ├── 
-├── # syscall 系统调用
+├── # IO syscall 系统调用
 ├── sys_epoll_linux.go
 ├── sys_epoll_linux_arm64.go
 ├── sys_exec.go
@@ -90,9 +90,9 @@ $ tree -L 1
 
 ### 系统调用
 
-这里指的系统调用并非宏观层面的syscall（这太多了，几乎所有go方法都依赖syscall），而是指netpoll进行网络交互的核心调用。
+这里指的系统调用并非宏观层面的syscall（这太多了，几乎所有go方法都依赖syscall），而是指netpoll进行网络交互的核心IO调用。
 
-netpoll依赖的核心系统调用只有2个，非常简单，对应的glibc函数签名为：
+netpoll依赖的核心IO系统调用只有2个，非常简单，对应的glibc函数签名为：
 
 ```c
 
