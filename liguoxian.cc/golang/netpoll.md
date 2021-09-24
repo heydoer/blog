@@ -6,11 +6,11 @@ sidebarDepth: 3
 
 ## 前言
 
-netpoll是字节跳动开源的一款基于goland、面向rpc场景的高性能网络服务框架，源码与官方文档见: [github/cloudwego](https://github.com/cloudwego/netpoll)
+netpoll是字节跳动开源的一款基于golang、面向rpc场景的高性能网络服务框架，源码与官方文档见: [github/cloudwego](https://github.com/cloudwego/netpoll)
 
 由于官方已经提供了比较完备的使用文档，且设计文档也在同步整理中，故本文不再赘述```netpoll```的使用场景、基本用法、设计的理论知识等内容，仅直接从代码角度探讨netpoll的具体实现。
 
-鉴于netpoll源码较多，本文进基于linux平台，就关键流程进行梳理，必要时会对源码进行一些删减或修改以方便阅读，故阅读时建议对照源码、自行斟酌。
+鉴于netpoll源码较多，本文基于linux平台，就关键流程进行梳理，必要时会对源码进行一些删减或修改以方便阅读，故阅读时建议对照源码、自行斟酌。
 
 本文参考netpoll版本为：[v0.0.4](https://github.com/cloudwego/netpoll/tree/v0.0.4)，该版本为书写本篇博客时的最新tag。
 
