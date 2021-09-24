@@ -365,6 +365,7 @@ type FDOperator struct {
 
 // Control 该方法等同于 epoll_ctl
 func (op *FDOperator) Control(event PollEvent) error {
+    // 参考 poll 一小节的 Control方法
 	return op.poll.Control(op, event)
 }
 ```
@@ -452,8 +453,6 @@ func (c *connection) outputAck(n int) (err error) {
 
 #### poll
 
-先看*poll*结构定义：
-
 ```go
 // netpoll/poll_default_linux.go
 
@@ -466,9 +465,79 @@ type defaultPoll struct {
 	Handler func(events []epollevent) (closed bool)
 }
 
+// openDefaultPoll
+// 新建一个 poll，本质是调用了 epoll_create 系统调用
+func openDefaultPoll() *defaultPoll {
+	var poll = defaultPoll{}
+	poll.buf = make([]byte, 8)
+	var p, err = syscall.EpollCreate1(0)
+	if err != nil {
+		panic(err)
+	}
+	poll.fd = p
+	
+	// ...
+	
+	return &poll
+}
+
+// Control 
+// poll提供了control方法，其实就是简单封装了 epoll_ctl ，
+// 当connection注册到poll时候，其实是调用了 connection.FDOperator.Control
+func (p *defaultPoll) Control(operator *FDOperator, event PollEvent) error {
+	var op int
+	var evt epollevent
+	*(**FDOperator)(unsafe.Pointer(&evt.data)) = operator
+	switch event {
+	case PollReadable:
+		operator.inuse()
+		op, evt.events = syscall.EPOLL_CTL_ADD, syscall.EPOLLIN|syscall.EPOLLRDHUP|syscall.EPOLLERR
+	case PollModReadable:
+		operator.inuse()
+		op, evt.events = syscall.EPOLL_CTL_MOD, syscall.EPOLLIN|syscall.EPOLLRDHUP|syscall.EPOLLERR
+	case PollDetach:
+		defer operator.unused()
+		op, evt.events = syscall.EPOLL_CTL_DEL, syscall.EPOLLIN|syscall.EPOLLOUT|syscall.EPOLLRDHUP|syscall.EPOLLERR
+	case PollWritable:
+		operator.inuse()
+		op, evt.events = syscall.EPOLL_CTL_ADD, EPOLLET|syscall.EPOLLOUT|syscall.EPOLLRDHUP|syscall.EPOLLERR
+	case PollR2RW:
+		op, evt.events = syscall.EPOLL_CTL_MOD, syscall.EPOLLIN|syscall.EPOLLOUT|syscall.EPOLLRDHUP|syscall.EPOLLERR
+	case PollRW2R:
+		op, evt.events = syscall.EPOLL_CTL_MOD, syscall.EPOLLIN|syscall.EPOLLRDHUP|syscall.EPOLLERR
+	}
+	return EpollCtl(p.fd, op, operator.FD, &evt)
+}
+
+// Wait 与上述两个方法一样，此方法也几乎等同于 epoll.wait
+func (p *defaultPoll) Wait() (err error) {
+	
+	// ...
+
+	for { // 几乎所有 Server 核心操作（网络IO、链接建立、缓冲维护、业务回调等），都聚集在这个for循环里面
+		// ...
+		n, err = EpollWait(p.fd, p.events, msec)
+		if err != nil && err != syscall.EINTR {
+			return err
+		}
+		if n <= 0 { // 如果没有事件，将本routine资源让出，过一会再wait
+			msec = -1
+			runtime.Gosched()
+			continue
+		}
+		msec = 0
+		// 如果有事件到达，则调用 handler
+		// 这里的 handler 即syscall一章我们提到过的进行IO操作的那个handler
+		// 这个handler，是整个 server 的IO驱动，大部分的IO操作都由这里实现
+		if p.Handler(p.events[:n]) {
+			return nil
+		}
+	}
+}
+
 ```
 
-然后顺带提一下*poll_manage*，这个对象管理了很多*poll*，每当有一个*connection*被建立，就会按照一定的均衡策略分配到一个*poll*中，相关代码在*netpoll/poll_manage.go*，比较简单这里就不描述了.
+顺带提一下*poll_manage*，这个对象管理了很多*poll*，每当有一个*connection*被建立，就会按照一定的均衡策略分配到一个*poll*中，相关代码在*netpoll/poll_manage.go*，比较简单，且无关主流程这里就不描述了.
 
 #### 总结
 
