@@ -474,9 +474,21 @@ type defaultPoll struct {
 
 结合*poll*、*connection*，这里给出一个 Server 处理事件的流程图：
 
-TODO
+![linkbuffer结构](/images/netpoll_4.jpeg)
 
+该流程图省略了大量细节，但已经足够表示netpoll Server端的核心工作机制，关于Client端本文表述很少，但是一旦理解Server，自然也就明白了Client了。
 
 ## 总结
 
-TODO
+其实 ***netpoll*** 并没有太多创新之处，更多是对各种技术站做了有机结合&调优。其主要依赖了：
+- epoll 实现的IO多路复用；
+- goroutine提供的超轻量级协程提高worker并发；
+- golang slice与sync.pool实现的内存&资源复用；
+- 系统调用调优，golang RawSysCall、NonBlock、ZeroCopy；
+- 其他；
+
+原理都是相通的，但细节是魔鬼，*netpoll*为业务屏蔽了大量的底层细节，使得在保持高性能同时，提供了简练易用且不失优雅的业务API。
+
+但是明显的槽点还是有的，就个人主观视角来看，编码上有点臃肿，可能是为了保留足够拓展性、或者是历史问题，许多链路的调用轨迹都有点匪夷所思，导致代码阅读起来不尽舒适。
+
+我个人对这份代码只能算是泛读，就不再进行更深入的讨论了。
