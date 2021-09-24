@@ -23,7 +23,7 @@ netpoll 的源码实现大致可以划分为4个模块，由低级向高级分�
 | syscall | 系统调用相关 |
 | linkbuffer | 缓冲区管理相关 |
 | poll&connection | 连接管理相关 |
-| netpoll | facade API |
+| netpoll | facade API(本文不讨论) |
 
 模块间大致的依赖关系如下:
 
