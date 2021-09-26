@@ -19,4 +19,8 @@
 
 <img src="/images/plan9_3.png" alt="" style="" />
 
-## 
+## 参考
+- <https://9p.io/sys/doc/asm.html>
+- <https://golang.org/doc/asm>
+- <https://golang.design/under-the-hood/zh-cn/part1basic/ch01basic/asm/>
+- <https://xargin.com/plan9-assembly/>
