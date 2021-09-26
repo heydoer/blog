@@ -15,7 +15,7 @@ module.exports = {
           {
             text: '深入学习',
             children: [
-              {text: 'Plan9 汇编指南', link: '/golang/plan9_scm_manual.md'},
+              {text: 'Plan9 汇编指南', link: '/golang/plan9_asm_manual.md'},
               {text: '通道', link: '/golang/chan.md'},
               {text: '协程', link: '/golang/goroutine.md'},
             ],
