@@ -25,10 +25,15 @@
 
 本文仅为了学习p9的基础汇编知识，不涉及太多网络、硬件等底层交互，所以为了方便，使用*virtual box*就好了。
 
-1. 安装[9front](http://9front.org/propaganda/) (p9一个分支)，你也可以选择[其他发行版](https://9p.io/wiki/plan9/download/) ；
+1. 安装[p9 iso](https://9p.io/plan9/download/plan9.iso.bz2), 你也可以选择另一个主流发行版 [9front](http://9front.org/propaganda/) ；
 1. 安装[Virtual Box](https://www.virtualbox.org/wiki/Downloads) ，找到自己平台最新版本iso包，傻瓜式安装即可（本文使用v6.1.26）；
 1. 创建一个虚拟机，本文参考配置为：*type of "Other/Unknown" ｜ 1024 MB RAM ｜ 10 GB VDI* ；
-1. 启动该虚拟机，启动盘的弹出窗口选择之前下载的iso文件；
+1. 创建完毕后，进一步设置：存储》创建一个虚拟光盘》选择之前下载的iso；
+1. 启动该虚拟机，选择安装或者直接从CD启动p9均可，然后一路按照默认配置回车完成系统启动；
+
+启动完毕后，plan9看上去就是这个样子的：
+
+<img src="/images/plan9_3.png" alt="plan9 roi" style="" />
 
 ## 汇编概述
 
