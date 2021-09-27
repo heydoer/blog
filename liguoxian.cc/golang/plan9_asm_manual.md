@@ -30,3 +30,4 @@
 - <https://golang.org/doc/asm>
 - <https://golang.design/under-the-hood/zh-cn/part1basic/ch01basic/asm/>
 - <https://xargin.com/plan9-assembly/>
+- <http://www.quanstro.net/newbie-guide.pdf>
