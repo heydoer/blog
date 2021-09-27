@@ -25,15 +25,22 @@
 
 本文仅为了学习p9的基础汇编知识，不涉及太多网络、硬件等底层交互，所以为了方便，使用*virtual box*就好了。
 
-1. 安装[p9 iso](https://9p.io/plan9/download/plan9.iso.bz2), 你也可以选择另一个主流发行版 [9front](http://9front.org/propaganda/) ；
+1. 安装[p9 iso](https://9p.io/plan9/download/plan9.iso.bz2), 你也可以选择其他主流发行版 [9front](http://9front.org/propaganda/) | [其他](https://9p.io/wiki/plan9/download/) ；
 1. 安装[Virtual Box](https://www.virtualbox.org/wiki/Downloads) ，找到自己平台最新版本iso包，傻瓜式安装即可（本文使用v6.1.26）；
 1. 创建一个虚拟机，本文参考配置为：*type of "Other/Unknown" ｜ 1024 MB RAM ｜ 10 GB VDI* ；
 1. 创建完毕后，进一步设置：存储》创建一个虚拟光盘》选择之前下载的iso；
-1. 启动该虚拟机，选择安装或者直接从CD启动p9均可，然后一路按照默认配置回车完成系统启动；
+1. 启动该虚拟机，选择直接从CD启动即可，这会让我们省去很多配置细节，然后一路默认配置回车直到启动桌面；
 
-启动完毕后，plan9看上去就是这个样子的：
+> 更多安装信息参考 <https://9p.io/wiki/plan9/installation_instructions/>
 
-<img src="/images/plan9_3.png" alt="plan9 roi" style="" />
+启动完毕后，plan9看上去就是这个样子的，这样，我们就拥有了一个用于学习p9-asm的操作环境：
+
+<img src="/images/p9_1.png" alt="plan9 roi" />
+
+⚠️：RIO是p9的桌面管理系统，acme是其文件编辑器，二者和我们常见的操作方式都有很大区别，建议阅读以下文档，先摸索一阵子，以掌握必备基础操作知识：
+- <https://9p.io/wiki/plan9/using_rio/index.html>
+- <https://9p.io/wiki/plan9/Using_acme/index.html>
+
 
 ## 汇编概述
 
@@ -47,3 +54,4 @@
 - <https://golang.design/under-the-hood/zh-cn/part1basic/ch01basic/asm/>
 - <https://xargin.com/plan9-assembly/>
 - <http://www.quanstro.net/newbie-guide.pdf>
+- <https://www.zhihu.com/topic/19612343/hot>
