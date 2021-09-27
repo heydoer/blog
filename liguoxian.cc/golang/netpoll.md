@@ -94,11 +94,10 @@ $ tree -L 1
 netpoll依赖的核心IO系统调用只有2个，非常简单，对应的glibc函数签名为：
 
 ```c
-
-// 发送数据
+// 接收数据
 ssize_t readv(int fd, const struct iovec *iov, int iovcnt);
 
-// 接收数据
+// 发送数据
 ssize_t sendmsg(int sockfd, const struct msghdr *msg, int flags);
 ```
 

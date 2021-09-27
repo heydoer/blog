@@ -1,4 +1,4 @@
-# Plan9 汇编指南
+# Plan9 汇编入门指南
 
 ## 背景
 作为一款教科书式的os，如果不是*golang*，估计很多人都没听过p9（实际上大部分在用go的人也没听过），那是因为这个系统确实很冷门，以至于现在只沦落为极客们用来把玩探索的"玩具"，几乎没有太多使用价值了。
@@ -20,6 +20,17 @@
 <img src="/images/plan9_3.png" alt="" style="" />
 
 ## 环境准备
+
+> NOTE: 对于p9来说，VirtualBox不是一个很好的选择，因为vb每个发行版的表现可能都有一些差异，为了规避各种大小的坑，可能需要用户对vb进行一些复杂设置才能让p9保持良好的运行状态，其实更推荐使用诸如```kvm | VMMare | qemu | xen``` 这些虚拟机，他们与p9配合可以更加贴近实机。
+
+本文仅为了学习p9的基础汇编知识，不涉及太多网络、硬件等底层交互，所以为了方便，使用*virtual box*就好了。
+
+1. 安装[9front](http://9front.org/propaganda/) (p9一个分支)，你也可以选择[其他发行版](https://9p.io/wiki/plan9/download/) ；
+1. 安装[Virtual Box](https://www.virtualbox.org/wiki/Downloads) ，找到自己平台最新版本iso包，傻瓜式安装即可（本文使用v6.1.26）；
+1. 创建一个虚拟机，本文参考配置为：*type of "Other/Unknown" ｜ 1024 MB RAM ｜ 10 GB VDI* ；
+1. 启动该虚拟机，启动盘的弹出窗口选择之前下载的iso文件；
+
+## 汇编概述
 
 ## 指令集
 
