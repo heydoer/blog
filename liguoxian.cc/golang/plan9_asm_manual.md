@@ -1,6 +1,6 @@
 # Plan9 汇编指南
 
-## 为啥要学 Plan9 asm
+## 背景
 作为一款教科书式的os，如果不是*golang*，估计很多人都没听过p9（实际上大部分在用go的人也没听过），那是因为这个系统确实很冷门，以至于现在只沦落为极客们用来把玩探索的"玩具"，几乎没有太多使用价值了。
 
 我们看下p9的 [wikipedia](https://en.wikipedia.org/wiki/Plan_9_from_Bell_Labs) ，发现这个东西实在是太屌了，出自UNIX之父 [Ken Thompson](https://en.wikipedia.org/wiki/Plan_9_from_Bell_Labs)  和一众贝尔实验室大神之手。这个项目有很多创新之举，比如彻底贯彻UNIX万物皆文件的理念，将几乎所有系统都被抽象为无差别的文件对象（这可远比vfs要彻底的多了），又比如首次使用了utf8（没错utf8也是这群人搞的），再比如设计了全新的汇编器等等……
@@ -18,6 +18,12 @@
 *tips：看p9和golang的吉祥物，就知道这俩货的关系不简单*
 
 <img src="/images/plan9_3.png" alt="" style="" />
+
+## 环境准备
+
+## 指令集
+
+## 范例
 
 ## 参考
 - <https://9p.io/sys/doc/asm.html>
