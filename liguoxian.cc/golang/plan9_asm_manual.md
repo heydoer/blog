@@ -27,9 +27,10 @@
 
 1. 安装[p9 iso](https://9p.io/plan9/download/plan9.iso.bz2), 你也可以选择其他主流发行版 [9front](http://9front.org/propaganda/) | [其他](https://9p.io/wiki/plan9/download/) ；
 1. 安装[Virtual Box](https://www.virtualbox.org/wiki/Downloads) ，找到自己平台最新版本iso包，傻瓜式安装即可（本文使用v6.1.26）；
-1. 创建一个虚拟机，本文参考配置为：*type of "Other/Unknown" ｜ 1024 MB RAM ｜ 10 GB VDI* ；
+1. 创建一个虚拟机，本文参考配置为：*type of "Other/Unknown" ｜ 256 MB RAM ｜ 2 GB VDI* ；
 1. 创建完毕后，进一步设置：存储》创建一个虚拟光盘》选择之前下载的iso；
-1. 启动该虚拟机，选择安装到硬盘（如果选择直接从CD启动，后续还需要手动进行文件分区挂载等操作，比较麻烦），然后按照提示一路默认配置回车直到启动桌面即可；
+1. 启动该虚拟机，选择安装到硬盘（如果选择直接从CD启动，后续还需要手动进行文件分区挂载等操作，比较麻烦），然后按照提示一路默认配置直到提示重启；
+1. 启动系统，user选项选择*glenda*，其他默认配置即可；
 
 > 更多安装信息参考 <https://9p.io/wiki/plan9/installation_instructions/>
 
@@ -41,8 +42,11 @@
 - <https://9p.io/wiki/plan9/using_rio/index.html>
 - <https://9p.io/wiki/plan9/Using_acme/index.html>
 
-## 汇编概述
+## hello world
 
+
+
+## 汇编概述
 
 ## 指令集
 

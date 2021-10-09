@@ -9,6 +9,7 @@ module.exports = {
     contributorsText: '作者',
     navbar: [
       {text: "Home", link: "/"},
+      {text: "Compiler", link: "/"},
       {
         text: 'Golang',
         children: [
@@ -42,6 +43,8 @@ module.exports = {
           {text: '手机验证码登陆', link: '/Website/phone_auth.md'},
         ],
       },
+      {text: "Compiler", link: "/"},
+      {text: "Misc", link: "/"},
     ],
   },
   plugins: [
